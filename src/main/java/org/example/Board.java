@@ -102,7 +102,16 @@ public class Board {
         return maxMoves;
     }
 
-    public void makeMove(int x, int y, boolean flagged) {
+    public void makeMove(int x, int y) {
+
+        boolean flagged;
+        if (x < 0 && y < 0) {
+            flagged = true;
+            x = -x;
+            y = -y;
+        } else
+            flagged = false;
+
         x--;
         y--;
 

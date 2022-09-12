@@ -30,15 +30,7 @@ public class Game {
             int x = sc.nextInt();
             int y = sc.nextInt();
 
-            boolean flagged;
-            if (x < 0 && y < 0) {
-                flagged = true;
-                x = -x;
-                y = -y;
-            } else
-                flagged = false;
-
-            game.board.makeMove(x, y, flagged);
+            game.board.makeMove(x, y);
             game.board.displayBoard();
         }
         System.out.println();
