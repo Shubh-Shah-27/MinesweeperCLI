@@ -1,32 +1,138 @@
 package org.example;
 
-import java.util.Arrays;
-
 public class Board {
-    private byte board [][];
-    private byte visited[][];
+    private final byte[][] board;
+    private final byte[][] visited;
 
-    Board(int size, int mines)
-    {
-        board = new byte[size][size];
-        visited = new byte[size][size];
-
-        placeMines(mines);
-        generateNumbers();
+    public int getLife() {
+        return life;
     }
 
-    Board(int row, int column, int mines)
+    private void loseLife()
+    {
+        life -= 1;
+    }
+
+    private int life;
+    public int getBlocksVisited() {
+        return blocksVisited;
+    }
+
+    public int getMines() {
+        return mines;
+    }
+
+    private int blocksVisited;
+    private final int mines;
+
+    public int getMaxMoves() {
+        return maxMoves;
+    }
+
+    private final int maxMoves;
+
+//    Board(int size, int mines, int life)
+//    {
+//        board = new byte[size][size];
+//        visited = new byte[size][size];
+//        blocksVisited = 0;
+//
+//        int lifeUpperLimit = (int)(0.05*size*size);
+//        int lifeLowerLimit = 1;
+//        if(life > lifeUpperLimit)
+//            this.life = lifeUpperLimit;
+//        else if(life < lifeLowerLimit)
+//            this.life = lifeLowerLimit;
+//
+//        int mineUpperLimit = (int) (0.3*size*size);
+//        int mineLowerLimit = (int) (0.1*size*size);
+//        if(mines > mineUpperLimit)
+//            mines = mineUpperLimit;
+//        else if(mines < mineLowerLimit)
+//            mines = mineLowerLimit;
+//
+//        placeMines(mines);
+//        generateNumbers();
+//    }
+
+    Board(int row, int column, int mines, int life)
     {
         board = new byte[row][column];
         visited = new byte[row][column];
+        blocksVisited = 0;
+        maxMoves = row*column;
 
-        placeMines(mines);
+        int lifeUpperLimit = (int)(0.05*row*column);
+        int lifeLowerLimit = 1;
+        if(life > lifeUpperLimit)
+            this.life = lifeUpperLimit;
+        else
+            this.life = Math.max(life, lifeLowerLimit);
+
+        int mineUpperLimit = (int) (0.3*row*column);
+        int mineLowerLimit = (int) (0.1*row*column);
+        if(mines > mineUpperLimit)
+            this.mines = mineUpperLimit;
+        else
+            this.mines = Math.max(mines, mineLowerLimit);
+
+        placeMines(this.mines);
         generateNumbers();
     }
 
-//    public byte[][] getBoard() {
-//        return board;
-//    }
+    public byte[][] getBoard() {
+        return board;
+    }
+
+    public void makeMove(int x, int y, boolean flagged)
+    {
+        x--;
+        y--;
+
+        if(x<0 || y<0 || x>=board.length || y>=board[x].length)
+            System.out.println("Input Out of Range");
+//            throw new IllegalArgumentException();
+        else if(visited[x][y] == 1)
+            System.out.println("Already Visited");
+        else
+        {
+            if(flagged) {
+                visited[x][y] = 2;
+                if(board[x][y] == -1)
+                    blocksVisited++;
+            }
+            else if(board[x][y] == -1) {
+                System.out.println("You hit a mine");
+                loseLife();
+                System.out.println("Lifes Left: "+life);
+            }
+            else
+                updateBoard(x,y);
+        }
+    }
+
+    private void updateBoard(int x, int y)
+    {
+        if(x<0 || y<0 || x>=board.length || y>=board[x].length)
+            return;
+
+        if(visited[x][y] != 0 || board[x][y] == -1)
+            return;
+
+        visited[x][y] = 1;
+        blocksVisited++;
+        if(board[x][y] == 0)
+        {
+            updateBoard(x-1,y);
+            updateBoard(x+1,y);
+            updateBoard(x,y-1);
+            updateBoard(x,y+1);
+            updateBoard(x-1,y-1);
+            updateBoard(x+1,y-1);
+            updateBoard(x-1,y+1);
+            updateBoard(x+1,y+1);
+        }
+    }
 
     public void displayBoard()
     {
@@ -35,10 +141,10 @@ public class Board {
             for (int j = 0; j < board[i].length; j++) {
                 if(visited[i][j] == 0)
                     System.out.print(". ");
-                else if(visited[i][j] == 1)
-                    System.out.println("F ");
+                else if(visited[i][j] == 2)
+                    System.out.print("F ");
                 else
-                    System.out.print(board[i][j]);
+                    System.out.print(board[i][j]+" ");
             }
             System.out.println();
         }
@@ -46,17 +152,10 @@ public class Board {
 
     private void placeMines(int mines)
     {
-        int mineUpperLimit = (int) (0.3*board.length);
-        int mineLowerLimit = (int) (0.05* board.length);
-        if(mines > mineUpperLimit)
-            mines = mineUpperLimit;
-        else if(mines < mineLowerLimit)
-            mines = mineLowerLimit;
-
         for(int i=1;i<=mines;i++)
         {
-            int num = (int)(Math.random()*100);
-            board[num/10][num%10] = -1; // Mine placed
+            int num = (int)(Math.random()* board.length* board[0].length);
+            board[num/ board.length][num% board[0].length] = -1; // Mine placed
         }
     }
 
