@@ -41,6 +41,6 @@ public class Game {
     }
 
     private boolean gameOn(Board board) {
-        return board.getLife() != 0 && ((board.getMaxMoves() - board.getBlocksVisited() > board.getMines()));
+        return board.getLife() != 0 && ((board.getMaxMoves() - board.getBlocksVisited()) > board.getMines());
     }
 }

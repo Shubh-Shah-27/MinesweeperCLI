@@ -5,7 +5,7 @@ public class Board {
     private final byte[][] visited;
     private int life;
     private int blocksVisited;
-    private final int mines;
+    private int mines;
     private final int maxMoves;
 
     Board(int row, int column, int mines, int life) {
@@ -14,19 +14,8 @@ public class Board {
         blocksVisited = 0;
         maxMoves = row * column;
 
-        int lifeUpperLimit = (int) (0.05 * row * column);
-        int lifeLowerLimit = 1;
-        if (life > lifeUpperLimit)
-            this.life = lifeUpperLimit;
-        else
-            this.life = Math.max(life, lifeLowerLimit);
-
-        int mineUpperLimit = (int) (0.3 * row * column);
-        int mineLowerLimit = (int) (0.1 * row * column);
-        if (mines > mineUpperLimit)
-            this.mines = mineUpperLimit;
-        else
-            this.mines = Math.max(mines, mineLowerLimit);
+        setLife(life);
+        setMines(mines);
 
         placeMines(this.mines);
         generateNumbers();
@@ -82,6 +71,15 @@ public class Board {
         }
     }
 
+    private void setLife(int life) {
+        int lifeUpperLimit = (int) (0.05 * board.length * board[0].length);
+        int lifeLowerLimit = 1;
+        if (life > lifeUpperLimit)
+            this.life = lifeUpperLimit;
+        else
+            this.life = Math.max(life, lifeLowerLimit);
+    }
+
     public int getLife() {
         return life;
     }
@@ -92,6 +90,15 @@ public class Board {
 
     public int getBlocksVisited() {
         return blocksVisited;
+    }
+
+    private void setMines(int mines) {
+        int mineUpperLimit = (int) (0.3 * board.length * board[0].length);
+        int mineLowerLimit = (int) (0.1 * board.length * board[0].length);
+        if (mines > mineUpperLimit)
+            this.mines = mineUpperLimit;
+        else
+            this.mines = Math.max(mines, mineLowerLimit);
     }
 
     public int getMines() {
@@ -122,12 +129,13 @@ public class Board {
         else {
             if (flagged) {
                 visited[x][y] = 2;
-                if (board[x][y] == -1)
-                    blocksVisited++;
+//                if (board[x][y] == -1)
+//                    blocksVisited++;
             } else if (board[x][y] == -1) {
                 System.out.println("You hit a mine");
                 loseLife();
                 System.out.println("Lifes Left: " + life);
+                visited[x][y] = 1;
             } else
                 updateBoard(x, y);
         }
